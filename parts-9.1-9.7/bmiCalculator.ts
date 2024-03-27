@@ -11,7 +11,12 @@ USAGE: calculateBmi height weight
     calculateBmi 180 74
 `;
 
-const calculateBmi = (height: number, mass: number): string => {
+export const calculateBmi = (heightParam: any, massParam: any): string => {
+  if (isNotNumber(heightParam) || isNotNumber(massParam))
+    throw new Error("Invalid parameter types");
+
+  const height = Number(heightParam);
+  const mass = Number(massParam);
   if (height <= 0 || mass <= 0) throw new Error("Invalid input detected");
 
   const bmi = Math.round((mass / (height / 100) ** 2) * 100) / 100;
@@ -26,10 +31,14 @@ const calculateBmi = (height: number, mass: number): string => {
   return "Obese (Class III)";
 };
 
-if (process.argv.length < 4) console.log(`Not enough parameters! ${USAGE_BMI}`);
-else if (process.argv.length > 4)
-  console.log(`Too many arguments! ${USAGE_BMI}`);
-else if (isNotNumber(process.argv[2]) || isNotNumber(process.argv[3]))
-  console.log(`Invalid parameter types! ${USAGE_BMI}`);
-else
-  console.log(calculateBmi(Number(process.argv[2]), Number(process.argv[3])));
+try {
+  if (process.argv.length < 4)
+    console.log(`Not enough parameters! ${USAGE_BMI}`);
+  else if (process.argv.length > 4)
+    console.log(`Too many arguments! ${USAGE_BMI}`);
+  else console.log(calculateBmi(process.argv[2], process.argv[3]));
+} catch (error: unknown) {
+  let errorMessage = "An error occured: ";
+  if (error instanceof Error) errorMessage += error.message;
+  console.log(errorMessage);
+}
