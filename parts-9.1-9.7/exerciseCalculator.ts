@@ -1,4 +1,16 @@
+import { isNotNumber } from "./utils/utils";
+
 const RATING_DESCRIPTION = ["Below target", "Target met", "Above target"];
+const USAGE_EXERCISE = `
+USAGE: calculateExercises targetHours exerciseHours
+
+  where:
+    targetHours: target number of hours
+    exerciseHours: list hours spent per day exercising
+
+  sample:
+    calculateExercises 2 3 0 2 4.5 0 3 1
+`;
 
 interface Result {
   periodLength: number;
@@ -32,6 +44,15 @@ const calculateExercises = (
   };
 };
 
-console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2));
-console.log(calculateExercises([3, 0.5, 2, 4.5, 0, 3, 1], 2));
-console.log(calculateExercises([3, 0, 2, 4.5, 2, 3, 1], 2));
+const [, , target, ...hours] = process.argv;
+if (isNotNumber(target))
+  console.log(`Invalid targetHours type! ${USAGE_EXERCISE}`);
+else if (hours.filter((hour) => isNotNumber(hour)).length > 0)
+  console.log(`Invalid exerciseHours type! ${USAGE_EXERCISE}`);
+else
+  console.log(
+    calculateExercises(
+      hours.map((hour) => Number(hour)),
+      Number(target)
+    )
+  );
