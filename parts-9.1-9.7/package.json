@@ -6,6 +6,8 @@
   "scripts": {
     "calculateBmi": "ts-node bmiCalculator.ts",
     "calculateExercises": "ts-node exerciseCalculator.ts",
+    "start": "ts-node index.ts",
+    "dev": "ts-node-dev index.ts",
     "test": "test"
   },
   "repository": {
@@ -22,7 +24,12 @@
   },
   "homepage": "https://github.com/toffet-masajo/fullstackopen-kmasajo-part9#readme",
   "dependencies": {
+    "express": "^4.19.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.3"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "ts-node-dev": "^2.0.0"
   }
 }
