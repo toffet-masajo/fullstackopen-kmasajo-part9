@@ -27,6 +27,7 @@ interface DiaryEntry {
 
 const App = () => {
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
+  const [error, setError] = useState<string>("");
   const [date, setDate] = useState<string>("");
   const [visibility, setVisibility] = useState<string>("");
   const [weather, setWeather] = useState<string>("");
@@ -34,9 +35,9 @@ const App = () => {
 
   useEffect(() => {
     axios.get<DiaryEntry[]>(URL).then((response) => setEntries(response.data));
-  });
+  }, []);
 
-  const onAddNewDiaryEntry = (event: React.SyntheticEvent) => {
+  const onAddNewDiaryEntry = async (event: React.SyntheticEvent) => {
     event.preventDefault();
     const diaryEntryToAdd = {
       date,
@@ -44,18 +45,29 @@ const App = () => {
       weather,
       comment,
     };
-    axios
-      .post(URL, diaryEntryToAdd)
-      .then((response) => setEntries(entries.concat(response.data)));
-    setDate("");
-    setVisibility("");
-    setWeather("");
-    setComment("");
+    try {
+      const response = await axios.post(URL, diaryEntryToAdd);
+      setEntries(entries.concat(response.data));
+      setDate("");
+      setVisibility("");
+      setWeather("");
+      setComment("");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (typeof error.response?.data === "string")
+          setError(error.response?.data);
+      } else {
+        setError(error as string);
+      }
+    } finally {
+      setTimeout(() => setError(""), 5000);
+    }
   };
 
   return (
     <>
       <h2>Add new entry</h2>
+      {error !== "" && <div style={{ color: "red" }}>{error}</div>}
       <form onSubmit={onAddNewDiaryEntry}>
         <div>
           date:{" "}
