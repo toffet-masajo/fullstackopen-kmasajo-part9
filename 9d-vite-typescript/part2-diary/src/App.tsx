@@ -72,23 +72,28 @@ const App = () => {
         <div>
           date:{" "}
           <input
+            type="date"
             value={date}
             onChange={(event) => setDate(event.target.value)}
           />
         </div>
         <div>
           visibility:{" "}
-          <input
-            value={visibility}
-            onChange={(event) => setVisibility(event.target.value)}
-          />
+          {Object.values(VisibilityType).map((value) => (
+            <>
+              <input type="radio" onChange={() => setVisibility(value)} />
+              <label>{value}</label>{" "}
+            </>
+          ))}
         </div>
         <div>
           weather:{" "}
-          <input
-            value={weather}
-            onChange={(event) => setWeather(event.target.value)}
-          />
+          {Object.values(WeatherType).map((value) => (
+            <>
+              <input type="radio" onChange={() => setWeather(value)} />
+              <label>{value}</label>
+            </>
+          ))}
         </div>
         <div>
           comment:{" "}
