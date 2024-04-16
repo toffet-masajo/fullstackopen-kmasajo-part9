@@ -1,6 +1,10 @@
 import express from "express";
 
-import { addPatient, getPatientsPublic } from "../services/patientService";
+import {
+  addPatient,
+  getPatient,
+  getPatientsPublic,
+} from "../services/patientService";
 import { toNewPatient } from "../utils";
 
 const router = express.Router();
@@ -19,6 +23,12 @@ router.post("/", (req, res) => {
     if (error instanceof Error) errorMessage += error.message;
     res.status(404).send(errorMessage);
   }
+});
+
+router.get("/:id", (req, res) => {
+  const { id } = req.params;
+  const patient = getPatient(id);
+  res.json(patient || { error: "patient not found" });
 });
 
 export default router;
