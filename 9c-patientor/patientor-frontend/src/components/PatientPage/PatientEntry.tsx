@@ -5,8 +5,9 @@ import {
   HospitalEntry,
   OccupationalHealthcareEntry,
 } from "../../types";
+import DiagnosisEntry from "./DiagnosisEntry";
 
-type EntryProps = {
+type PatientEntryProps = {
   entry: Entry;
 };
 
@@ -49,17 +50,19 @@ const OccupationalHealthcareData = ({
     <div>
       <Typography align="left" variant="body1">
         {entry.date} {entry.description}
-        <List>
-          {entry.diagnosisCodes?.map((diagnosis) => (
-            <ListItem>{diagnosis}</ListItem>
-          ))}
-        </List>
       </Typography>
+      <List>
+        {entry.diagnosisCodes?.map((diagnosis) => (
+          <ListItem key={diagnosis}>
+            <DiagnosisEntry diagnosis={diagnosis} />
+          </ListItem>
+        ))}
+      </List>
     </div>
   );
 };
 
-const EntryData = ({ entry }: EntryProps) => {
+const PatientEntry = ({ entry }: PatientEntryProps) => {
   if (entry.type === "HealthCheck") return <HealthCheckData entry={entry} />;
   if (entry.type === "Hospital") return <HospitalData entry={entry} />;
   if (entry.type === "OccupationalHealthcare")
@@ -67,4 +70,4 @@ const EntryData = ({ entry }: EntryProps) => {
   return <div></div>;
 };
 
-export default EntryData;
+export default PatientEntry;

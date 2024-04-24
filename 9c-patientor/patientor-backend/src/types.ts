@@ -68,3 +68,4 @@ export interface Patient {
 export type NewPatient = Omit<Patient, "id">;
 export type NonSensitivePatient = Omit<Patient, "ssn">;
 export type PatientData = Patient | undefined;
+export type DiagnosisApiValue = Diagnosis | undefined;

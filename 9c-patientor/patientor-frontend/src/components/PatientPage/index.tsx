@@ -49,8 +49,8 @@ const PatientPage = ({ patientId }: PatientProps) => {
         <Typography align="left" variant="h6">
           entries
         </Typography>
-        {patient.entries?.map((entry) => (
-          <PatientEntry entry={entry} />
+        {patient.entries?.map((entry, id) => (
+          <PatientEntry key={id} entry={entry} />
         ))}
       </Box>
     </div>
