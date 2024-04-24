@@ -2,6 +2,7 @@ import { Typography, Box } from "@mui/material";
 import { Female, Male, QuestionMark } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 
+import PatientEntry from "./PatientEntry";
 import { Gender, Patient } from "../../types";
 import patientService from "../../services/patients";
 
@@ -44,6 +45,14 @@ const PatientPage = ({ patientId }: PatientProps) => {
       <Typography align="left" variant="body1">
         occupation: {patient.occupation}
       </Typography>
+      <Box>
+        <Typography align="left" variant="h6">
+          entries
+        </Typography>
+        {patient.entries?.map((entry) => (
+          <PatientEntry entry={entry} />
+        ))}
+      </Box>
     </div>
   ) : (
     <div>
