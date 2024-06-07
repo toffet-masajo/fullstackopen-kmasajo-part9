@@ -1,4 +1,8 @@
-import { List, ListItem, Typography } from "@mui/material";
+import { Box, List, ListItem, Typography } from "@mui/material";
+import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
+import WorkIcon from "@mui/icons-material/Work";
+import LocalHospitalSharpIcon from "@mui/icons-material/LocalHospitalSharp";
+
 import {
   Entry,
   HealthCheckEntry,
@@ -6,6 +10,7 @@ import {
   OccupationalHealthcareEntry,
 } from "../../types";
 import DiagnosisEntry from "./DiagnosisEntry";
+import HealthRatingBar from "../HealthRatingBar";
 
 type PatientEntryProps = {
   entry: Entry;
@@ -25,21 +30,36 @@ type OccupationalHealthcareEntryProps = {
 
 const HealthCheckData = ({ entry }: HealthCheckEntryProps) => {
   return (
-    <div>
+    <Box component="section" sx={{ p: 2, border: "1px solid grey" }}>
       <Typography align="left" variant="body1">
-        {entry.date} {entry.description}
+        {entry.date} <MedicalServicesIcon />
       </Typography>
-    </div>
+      <Typography align="left" variant="body1">
+        {entry.description}
+      </Typography>
+      <Typography align="left" variant="body1">
+        <HealthRatingBar rating={entry.healthCheckRating} showText={false} />
+      </Typography>
+      <Typography align="left" variant="body1">
+        Diagnosed by {entry.specialist}
+      </Typography>
+    </Box>
   );
 };
 
 const HospitalData = ({ entry }: HospitalEntryProps) => {
   return (
-    <div>
+    <Box component="section" sx={{ p: 2, border: "1px solid grey" }}>
       <Typography align="left" variant="body1">
-        {entry.date} {entry.description}
+        {entry.date} <LocalHospitalSharpIcon />
       </Typography>
-    </div>
+      <Typography align="left" variant="body1">
+        {entry.description}
+      </Typography>
+      <Typography align="left" variant="body1">
+        Diagnosed by {entry.specialist}
+      </Typography>
+    </Box>
   );
 };
 
@@ -47,27 +67,40 @@ const OccupationalHealthcareData = ({
   entry,
 }: OccupationalHealthcareEntryProps) => {
   return (
-    <div>
+    <Box component="section" sx={{ p: 2, border: "1px solid grey" }}>
       <Typography align="left" variant="body1">
-        {entry.date} {entry.description}
+        {entry.date} <WorkIcon />
       </Typography>
-      <List>
-        {entry.diagnosisCodes?.map((diagnosis) => (
-          <ListItem key={diagnosis}>
-            <DiagnosisEntry diagnosis={diagnosis} />
-          </ListItem>
-        ))}
-      </List>
-    </div>
+      <Typography align="left" variant="body1">
+        {entry.description}
+      </Typography>
+      {entry.diagnosisCodes && (
+        <List>
+          {entry.diagnosisCodes.map((diagnosis) => (
+            <ListItem key={diagnosis}>
+              <DiagnosisEntry diagnosis={diagnosis} />
+            </ListItem>
+          ))}
+        </List>
+      )}
+      <Typography align="left" variant="body1">
+        Diagnosed by {entry.specialist}
+      </Typography>
+    </Box>
   );
 };
 
 const PatientEntry = ({ entry }: PatientEntryProps) => {
-  if (entry.type === "HealthCheck") return <HealthCheckData entry={entry} />;
-  if (entry.type === "Hospital") return <HospitalData entry={entry} />;
-  if (entry.type === "OccupationalHealthcare")
-    return <OccupationalHealthcareData entry={entry} />;
-  return <div></div>;
+  switch (entry.type) {
+    case "HealthCheck":
+      return <HealthCheckData entry={entry} />;
+    case "Hospital":
+      return <HospitalData entry={entry} />;
+    case "OccupationalHealthcare":
+      return <OccupationalHealthcareData entry={entry} />;
+    default:
+      return null;
+  }
 };
 
 export default PatientEntry;
