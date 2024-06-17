@@ -5,12 +5,24 @@ export enum HealthCheckRating {
   "CriticalRisk" = 3,
 }
 
-interface SickLeave {
+export enum Gender {
+  Male = "male",
+  Female = "female",
+  Other = "other",
+}
+
+export interface Diagnosis {
+  code: string;
+  name: string;
+  latin?: string;
+}
+
+export interface SickLeave {
   startDate: string;
   endDate: string;
 }
 
-interface Discharge {
+export interface Discharge {
   date: string;
   criteria: string;
 }
@@ -44,17 +56,6 @@ export type Entry =
   | HospitalEntry
   | OccupationalHealthcareEntry;
 
-export interface Diagnosis {
-  code: string;
-  name: string;
-  latin?: string;
-}
-
-export enum Gender {
-  Male = "male",
-  Female = "female",
-  Other = "other",
-}
 export interface Patient {
   id: string;
   name: string;
@@ -65,7 +66,12 @@ export interface Patient {
   entries: Entry[];
 }
 
+type UnionOmit<T, K extends string | number | symbol> = T extends unknown
+  ? Omit<T, K>
+  : never;
+
 export type NewPatient = Omit<Patient, "id">;
 export type NonSensitivePatient = Omit<Patient, "ssn">;
 export type PatientData = Patient | undefined;
 export type DiagnosisApiValue = Diagnosis | undefined;
+export type NewEntry = UnionOmit<Entry, "id">;
