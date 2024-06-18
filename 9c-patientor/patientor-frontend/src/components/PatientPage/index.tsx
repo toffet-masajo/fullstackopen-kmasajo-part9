@@ -1,7 +1,9 @@
-import { Typography, Box } from "@mui/material";
 import { Female, Male, QuestionMark } from "@mui/icons-material";
+import { Typography, Button } from "@mui/material";
+import axios from "axios";
 import { useEffect, useState } from "react";
 
+import AddEntryModal from "../AddEntryModal";
 import PatientEntry from "./PatientEntry";
 import { Gender, Patient } from "../../types";
 import patientService from "../../services/patients";
@@ -21,6 +23,8 @@ const GenderSymbol = ({ gender }: GenderProps) => {
 };
 
 const PatientPage = ({ patientId }: PatientProps) => {
+  const [error, setError] = useState<string>();
+  const [showAddEntry, setShowAddEntry] = useState<boolean>(false);
   const [patient, setPatient] = useState<Patient>();
 
   useEffect(() => {
@@ -31,28 +35,93 @@ const PatientPage = ({ patientId }: PatientProps) => {
     void fetchPatientData();
   }, [patientId]);
 
+  const closeModal = () => {
+    setError(undefined);
+    setShowAddEntry(false);
+  };
+
+  const submitNewEntry = async (
+    description: string,
+    date: string,
+    specialist: string,
+    rating: string,
+    diagnosis: string
+  ) => {
+    try {
+      const newEntry = await patientService.addEntry(patientId, {
+        description,
+        date,
+        specialist,
+        diagnosisCodes: diagnosis.split(",").map((item) => item.trim()),
+        healthCheckRating: parseInt(rating, 10),
+      });
+      patient?.entries?.push(newEntry);
+      closeModal();
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        if (e?.response?.data && typeof e?.response?.data === "string") {
+          const message = e.response.data.replace(
+            "Something went wrong. Error: ",
+            ""
+          );
+          console.error(message);
+          setError(message);
+        } else {
+          setError("Unrecognized axios error");
+        }
+      } else {
+        console.error("Unknown error", e);
+        setError("Unknown error");
+      }
+    }
+  };
+
   return patient?.name ? (
     <div>
-      <Box>
+      <div>
         <Typography align="left" variant="h5">
           {patient.name}
           <GenderSymbol gender={patient.gender} />
         </Typography>
-      </Box>
-      <Typography align="left" variant="body1">
-        ssn: {patient.ssn}
-      </Typography>
-      <Typography align="left" variant="body1">
-        occupation: {patient.occupation}
-      </Typography>
-      <Box>
+        <Typography align="left" variant="body1">
+          ssn: {patient.ssn}
+        </Typography>
+        <Typography align="left" variant="body1">
+          occupation: {patient.occupation}
+        </Typography>
+      </div>
+      <div>
+        {!showAddEntry && (
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={() => setShowAddEntry(true)}
+          >
+            Add entry
+          </Button>
+        )}
+        {showAddEntry && (
+          <>
+            <br />
+            <AddEntryModal
+              error={error}
+              onClose={closeModal}
+              onSubmit={submitNewEntry}
+            />
+            <br />
+            <br />
+            <br />
+          </>
+        )}
+      </div>
+      <div>
         <Typography align="left" variant="h6">
           entries
         </Typography>
         {patient.entries?.map((entry, id) => (
           <PatientEntry key={id} entry={entry} />
         ))}
-      </Box>
+      </div>
     </div>
   ) : (
     <div>
