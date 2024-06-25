@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import AddEntryModal from "../AddEntryModal";
 import PatientEntry from "./PatientEntry";
-import { Gender, Patient } from "../../types";
+import { Entry, Gender, NewEntry, Patient } from "../../types";
 import patientService from "../../services/patients";
 
 interface PatientProps {
@@ -40,21 +40,13 @@ const PatientPage = ({ patientId }: PatientProps) => {
     setShowAddEntry(false);
   };
 
-  const submitNewEntry = async (
-    description: string,
-    date: string,
-    specialist: string,
-    rating: string,
-    diagnosis: string
-  ) => {
+  const submitNewEntry = async (entry: NewEntry) => {
     try {
-      const newEntry = await patientService.addEntry(patientId, {
-        description,
-        date,
-        specialist,
-        diagnosisCodes: diagnosis.split(",").map((item) => item.trim()),
-        healthCheckRating: parseInt(rating, 10),
-      });
+      console.log(entry);
+      const newEntry = (await patientService.addEntry(
+        patientId,
+        entry
+      )) as Entry;
       patient?.entries?.push(newEntry);
       closeModal();
     } catch (e: unknown) {

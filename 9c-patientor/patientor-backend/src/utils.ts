@@ -17,6 +17,10 @@ const isString = (text: unknown): text is string => {
   return typeof text === "string" || text instanceof String;
 };
 
+const isEmpty = (text: string): boolean => {
+  return text === "";
+};
+
 const isDate = (date: string): boolean => {
   return Boolean(Date.parse(date));
 };
@@ -36,7 +40,8 @@ const isValidRating = (num: number): boolean => {
 };
 
 const parseCriteria = (criteria: unknown): string => {
-  if (!isString(criteria)) throw new Error("Invalid criteria format");
+  if (!isString(criteria) || isEmpty(criteria))
+    throw new Error("Invalid criteria format");
   return criteria;
 };
 
@@ -47,7 +52,8 @@ const parseDate = (date: unknown): string => {
 };
 
 const parseDescription = (description: unknown): string => {
-  if (!isString(description)) throw new Error("Invalid description format");
+  if (!isString(description) || isEmpty(description))
+    throw new Error("Invalid description format");
   return description;
 };
 
@@ -73,7 +79,8 @@ const parseDischarge = (object: unknown): Discharge => {
 };
 
 const parseEmployer = (employer: unknown): string => {
-  if (!isString(employer)) throw new Error("Incorrect employer format");
+  if (!isString(employer) || isEmpty(employer))
+    throw new Error("Incorrect employer format");
   return employer;
 };
 
@@ -90,12 +97,14 @@ const parseHealthCheckRating = (rating: unknown): HealthCheckRating => {
 };
 
 const parseName = (name: unknown): string => {
-  if (!isString(name)) throw new Error("Incorrect name format");
+  if (!isString(name) || isEmpty(name))
+    throw new Error("Incorrect name format");
   return name;
 };
 
 const parseOccupation = (occupation: unknown): string => {
-  if (!isString(occupation)) throw new Error("Incorrect occupation format");
+  if (!isString(occupation) || isEmpty(occupation))
+    throw new Error("Incorrect occupation format");
   return occupation;
 };
 

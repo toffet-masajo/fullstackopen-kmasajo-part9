@@ -44,6 +44,12 @@ export type Entry =
   | HospitalEntry
   | OccupationalHealthcareEntry;
 
+export enum EntryType {
+  HealthCheck = "Health Check",
+  Hospital = "Hospitalization",
+  OccupationalHealthcare = "Occupational Healthcare",
+}
+
 export interface Diagnosis {
   code: string;
   name: string;
@@ -63,7 +69,7 @@ export interface Patient {
   gender: Gender;
   ssn?: string;
   dateOfBirth?: string;
-  entries?: [];
+  entries?: Entry[];
 }
 
 type UnionOmit<T, K extends string | number | symbol> = T extends unknown
