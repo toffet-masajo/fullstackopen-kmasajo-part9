@@ -42,7 +42,6 @@ const PatientPage = ({ patientId }: PatientProps) => {
 
   const submitNewEntry = async (entry: NewEntry) => {
     try {
-      console.log(entry);
       const newEntry = (await patientService.addEntry(
         patientId,
         entry

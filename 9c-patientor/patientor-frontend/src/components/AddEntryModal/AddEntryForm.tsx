@@ -1,11 +1,22 @@
 import {
   Autocomplete,
+  Box,
   Button,
+  Checkbox,
+  Chip,
   Grid,
+  Input,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import diagnosisService from "../../services/diagnoses";
 import { EntryType, NewEntry } from "../../types";
 
 interface Props {
@@ -16,6 +27,16 @@ interface Props {
 const AddEntryForm = ({ onClose, onSubmit }: Props) => {
   const [newEntry, setNewEntry] = useState<NewEntry>({} as NewEntry);
   const [entryType, setEntryType] = useState<string>(EntryType.HealthCheck);
+  const [diagnoses, setDiagnoses] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchDiagnosisData = async () => {
+      const data = await diagnosisService.getDiagnoses();
+      setDiagnoses(data.map((item) => item.code.concat(" - ", item.name)));
+    };
+
+    void fetchDiagnosisData();
+  }, []);
 
   return (
     <div>
@@ -30,63 +51,100 @@ const AddEntryForm = ({ onClose, onSubmit }: Props) => {
         renderInput={(params) => <TextField {...params} label="Entry type" />}
         value={entryType}
       />
-      <Typography align="left" variant="h6">
+      <Typography align="left" style={{ marginTop: 30 }} variant="h6">
         New {entryType} Entry
       </Typography>
+      <InputLabel style={{ marginTop: 20 }}>Description</InputLabel>
       <TextField
-        label="Description"
         fullWidth
         value={newEntry.description ?? ""}
+        variant="standard"
         onChange={({ target }) =>
           setNewEntry({ ...newEntry, description: target.value })
         }
       />
-      <TextField
-        label="Date"
+      <InputLabel style={{ marginTop: 20 }}>Entry date</InputLabel>
+      <Input
         fullWidth
         value={newEntry.date ?? ""}
+        type="date"
         onChange={({ target }) =>
           setNewEntry({ ...newEntry, date: target.value })
         }
       />
+      <InputLabel style={{ marginTop: 20 }}>Specialist</InputLabel>
       <TextField
-        label="Specialist"
         fullWidth
         value={newEntry.specialist ?? ""}
+        variant="standard"
         onChange={({ target }) =>
           setNewEntry({ ...newEntry, specialist: target.value })
         }
       />
-      <TextField
-        label="Diagnosis codes"
+      <InputLabel style={{ marginTop: 20 }}>Diagnosis codes</InputLabel>
+      <Select
         fullWidth
-        value={newEntry.diagnosisCodes?.join(", ") ?? ""}
-        onChange={({ target }) =>
+        multiple
+        renderValue={(selected) => (
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+            {selected?.map((value) => {
+              const code = value.split(" - ")[0];
+              return <Chip key={code} label={code} />;
+            })}
+          </Box>
+        )}
+        value={newEntry.diagnosisCodes ?? []}
+        onChange={(
+          event: SelectChangeEvent<typeof newEntry.diagnosisCodes>
+        ) => {
+          const {
+            target: { value },
+          } = event;
+          const newCodes = value.map((item) => item.split(" - ")[0]);
           setNewEntry({
             ...newEntry,
-            diagnosisCodes: target.value.split(",").map((item) => item.trim()),
-          })
-        }
-      />
+            diagnosisCodes:
+              typeof newCodes === "string"
+                ? newCodes.split(",").map((item) => item.trim())
+                : newCodes,
+          });
+        }}
+      >
+        {diagnoses.map((item) => {
+          const code = item.split(" - ")[0];
+          return (
+            <MenuItem key={code} value={item}>
+              <Checkbox checked={newEntry.diagnosisCodes?.indexOf(code) > -1} />
+              <ListItemText primary={item} />
+            </MenuItem>
+          );
+        })}
+      </Select>
       {entryType === EntryType.HealthCheck && (
-        <TextField
-          label="Healthcheck Rating"
-          fullWidth
-          value={newEntry.healthCheckRating ?? ""}
-          onChange={({ target }) =>
-            setNewEntry({
-              ...newEntry,
-              healthCheckRating: Number(target.value),
-            })
-          }
-        />
+        <>
+          <InputLabel style={{ marginTop: 20 }}>Healthcheck Rating</InputLabel>
+          <TextField
+            fullWidth
+            InputProps={{ inputProps: { min: 1, max: 4 } }}
+            value={newEntry.healthCheckRating ?? ""}
+            variant="standard"
+            type="number"
+            onChange={({ target }) =>
+              setNewEntry({
+                ...newEntry,
+                healthCheckRating: Number(target.value),
+              })
+            }
+          />
+        </>
       )}
       {entryType === EntryType.Hospital && (
         <>
-          <TextField
-            label="Discharge date"
+          <InputLabel style={{ marginTop: 20 }}>Discharge date</InputLabel>
+          <Input
             fullWidth
             value={newEntry.discharge?.date ?? ""}
+            type="date"
             onChange={({ target }) =>
               setNewEntry({
                 ...newEntry,
@@ -94,8 +152,8 @@ const AddEntryForm = ({ onClose, onSubmit }: Props) => {
               })
             }
           />
+          <InputLabel style={{ marginTop: 20 }}>Discharge criteria</InputLabel>
           <TextField
-            label="Discharge criteria"
             fullWidth
             value={newEntry.discharge?.criteria ?? ""}
             onChange={({ target }) =>
@@ -109,36 +167,51 @@ const AddEntryForm = ({ onClose, onSubmit }: Props) => {
       )}
       {entryType === EntryType.OccupationalHealthcare && (
         <>
+          <InputLabel style={{ marginTop: 20 }}>Employer</InputLabel>
           <TextField
-            label="Employer"
             fullWidth
             value={newEntry.employerName ?? ""}
             onChange={({ target }) =>
               setNewEntry({ ...newEntry, employerName: target.value })
             }
           />
-          <TextField
-            label="Sick leave start date"
-            value={newEntry.sickLeave?.startDate ?? ""}
-            onChange={({ target }) =>
-              setNewEntry({
-                ...newEntry,
-                sickLeave: { ...newEntry.sickLeave, startDate: target.value },
-              })
-            }
-          />
-          <TextField
-            label="Sick leave end date"
-            value={newEntry.sickLeave?.endDate ?? ""}
-            onChange={({ target }) =>
-              setNewEntry({
-                ...newEntry,
-                sickLeave: { ...newEntry.sickLeave, endDate: target.value },
-              })
-            }
-          />
+          <InputLabel style={{ marginTop: 20 }}>Sick Leave</InputLabel>
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <InputLabel style={{ marginTop: 20 }}>start date</InputLabel>
+              <Input
+                fullWidth
+                value={newEntry.sickLeave?.startDate ?? ""}
+                type="date"
+                onChange={({ target }) =>
+                  setNewEntry({
+                    ...newEntry,
+                    sickLeave: {
+                      ...newEntry.sickLeave,
+                      startDate: target.value,
+                    },
+                  })
+                }
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <InputLabel style={{ marginTop: 20 }}>end date</InputLabel>
+              <Input
+                fullWidth
+                value={newEntry.sickLeave?.endDate ?? ""}
+                type="date"
+                onChange={({ target }) =>
+                  setNewEntry({
+                    ...newEntry,
+                    sickLeave: { ...newEntry.sickLeave, endDate: target.value },
+                  })
+                }
+              />
+            </Grid>
+          </Grid>
         </>
       )}
+      <InputLabel style={{ marginTop: 20 }} />
       <Grid>
         <Grid item>
           <Button
